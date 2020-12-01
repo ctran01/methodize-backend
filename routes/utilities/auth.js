@@ -23,23 +23,29 @@ const restoreUser = (req, res, next) => {
     return res.set("WWW-Authenticate", "Bearer").status(401).end();
   }
 
-  return jwt.verify(token, secret, null, async (err, jwtPayload) => {
-    if (err) {
-      err.status = 401;
-      return next(err);
-    }
+  //Changed jwt token here as well
+  return jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    null,
+    async (err, jwtPayload) => {
+      if (err) {
+        err.status = 401;
+        return next(err);
+      }
 
-    const { id } = jwtPayload.data;
-    try {
-      req.user = await User.findByPk(id);
-    } catch (e) {
-      return next(e);
+      const { id } = jwtPayload.data;
+      try {
+        req.user = await User.findByPk(id);
+      } catch (e) {
+        return next(e);
+      }
+      if (!req.user) {
+        return res.set("WWW-Authenicate", "Bearer").status(401).end();
+      }
+      return next();
     }
-    if (!req.user) {
-      return res.set("WWW-Authenicate", "Bearer").status(401).end();
-    }
-    return next();
-  });
+  );
 };
 
 const requireAuth = [bearerToken(), restoreUser];
