@@ -19,11 +19,13 @@ router.get(
 );
 
 //Get all projects for a user
+//get all projects for teams that a user is on
+
 router.get(
   "/user/:id",
   asyncHandler(async (req, res, next) => {
     const user_id = req.params.id;
-    const projects = await Project.findAll({
+    const projects = await Team.findAll({
       include: [
         {
           model: User,
@@ -32,6 +34,7 @@ router.get(
           },
           attributes: ["name"],
         },
+        { model: Project },
       ],
     });
     res.json(projects);
@@ -82,7 +85,10 @@ router.get(
   asyncHandler(async (req, res, next) => {
     const project_id = req.params.id;
     const team = await Team.findOne({
-      include: [{ model: Project, where: { id: project_id } }],
+      include: [
+        { model: Project, where: { id: project_id } },
+        { model: User, attributes: ["name"] },
+      ],
     });
     res.json(team);
   })

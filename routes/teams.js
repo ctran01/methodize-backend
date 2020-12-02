@@ -187,14 +187,17 @@ router.post(
     const { name, userId } = req.body;
     const project = await Project.create({
       name: name,
-      owner_id: userId,
       team_id: team_id,
     });
 
-    if (!project) {
-      res.status(404);
+    if (project) {
+      const userproject = await UserProject.create({
+        user_id: userId,
+        project_id: project.id,
+      });
+      res.json(userproject).status(201);
     } else {
-      res.json(project).status(201);
+      res.status(404);
     }
   })
 );
