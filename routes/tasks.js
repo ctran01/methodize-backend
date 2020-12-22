@@ -2,7 +2,7 @@ const express = require("express");
 const { asyncHandler } = require("./utilities/utils");
 const { requireAuth } = require("./utilities/auth");
 const { check, validationResult } = require("express-validator");
-const { Task, Comment } = require("../db/models");
+const { Task, Comment, Project, User } = require("../db/models");
 const comment = require("../db/models/comment");
 
 const router = express.Router();
@@ -28,6 +28,7 @@ router.get(
       where: {
         assignee_id: user_id,
       },
+      include: [{ model: Project }],
     });
     res.json(tasks);
   })
@@ -101,6 +102,23 @@ router.get(
       where: {
         id: task_id,
       },
+      include: [
+        {
+          model: Project,
+          include: {
+            model: User,
+            attributes: ["id", "name", "email", "image"],
+          },
+        },
+        { model: User, attributes: ["id", "name", "email", "image"] },
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ["id", "name", "email", "image"],
+          },
+        },
+      ],
     });
     res.json(task);
   })
@@ -127,6 +145,114 @@ router.put(
       res.json(task);
     } catch (err) {
       res.status(401).send({ error: "Something went wrong" });
+    }
+  })
+);
+
+//update project
+router.put(
+  `/:id/project/:projectId`,
+  asyncHandler(async (req, res, next) => {
+    const task_id = req.params.id;
+    const project_id = req.params.projectId;
+    try {
+      const updateTask = await Task.update(
+        {
+          project_id: project_id,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+      const task = await Task.findOne({ where: { id: task_id } });
+      res.json(task);
+    } catch (err) {
+      res.send({ error: "Something went wrong" });
+    }
+  })
+);
+
+//update Assignee
+router.put(
+  `/:id/assignee/:assigneeId`,
+  asyncHandler(async (req, res, next) => {
+    const task_id = req.params.id;
+    const assignee_id = req.params.assigneeId;
+    try {
+      const updateTask = await Task.update(
+        {
+          assignee_id: assignee_id,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+      const task = await Task.findOne({
+        where: {
+          id: task_id,
+        },
+        include: [
+          { model: Project },
+          { model: User, attributes: ["id", "name", "email", "image"] },
+        ],
+      });
+      res.json(task);
+    } catch (err) {
+      res.send({ error: "Something went wrong" });
+    }
+  })
+);
+
+//update due date
+router.put(
+  `/:id/dueDate/`,
+  asyncHandler(async (req, res, next) => {
+    const task_id = req.params.id;
+    const { date } = req.body;
+    try {
+      const updateTask = await Task.update(
+        {
+          due_date: date,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+      const task = await Task.findOne({ where: { id: task_id } });
+      res.json(task);
+    } catch (err) {
+      res.send({ error: "Something went wrong" });
+    }
+  })
+);
+
+//update description
+router.put(
+  `/:id/description/`,
+  asyncHandler(async (req, res, next) => {
+    const task_id = req.params.id;
+    const { description } = req.body;
+    try {
+      const updateTask = await Task.update(
+        {
+          description: description,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+      const task = await Task.findOne({ where: { id: task_id } });
+      res.json(task);
+    } catch (err) {
+      res.send({ error: "Something went wrong" });
     }
   })
 );

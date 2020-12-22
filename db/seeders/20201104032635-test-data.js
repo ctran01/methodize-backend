@@ -438,8 +438,15 @@ module.exports = {
       [
         {
           text: "I'll work on this soon",
-          task_id: 1,
+          task_id: 5,
           user_id: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          text: "I've heard that before",
+          task_id: 5,
+          user_id: 2,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
