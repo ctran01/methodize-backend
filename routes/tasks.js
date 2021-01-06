@@ -45,10 +45,11 @@ router.post(
       task_id: task_id,
       user_id: user_id,
     });
+
     if (!comment) {
       res.status(404);
     } else {
-      res.status(201);
+      res.json(comment).status(201);
     }
   })
 );
@@ -62,6 +63,8 @@ router.get(
       where: {
         task_id: task_id,
       },
+      include: [{ model: User, attributes: ["id", "name", "email", "image"] }],
+      order: [["id", "ASC"]],
     });
     res.json(comments);
   })
@@ -209,7 +212,7 @@ router.put(
 
 //update due date
 router.put(
-  `/:id/dueDate/`,
+  `/:id/dueDate`,
   asyncHandler(async (req, res, next) => {
     const task_id = req.params.id;
     const { date } = req.body;
@@ -234,7 +237,7 @@ router.put(
 
 //update description
 router.put(
-  `/:id/description/`,
+  `/:id/description`,
   asyncHandler(async (req, res, next) => {
     const task_id = req.params.id;
     const { description } = req.body;
@@ -250,6 +253,52 @@ router.put(
         }
       );
       const task = await Task.findOne({ where: { id: task_id } });
+      res.json(task);
+    } catch (err) {
+      res.send({ error: "Something went wrong" });
+    }
+  })
+);
+
+//update complete
+router.put(
+  `/:id/complete`,
+  asyncHandler(async (req, res, next) => {
+    const task_id = req.params.id;
+    const { completed } = req.body;
+    try {
+      const updateTask = await Task.update(
+        {
+          completed: completed,
+        },
+        {
+          where: {
+            id: task_id,
+          },
+        }
+      );
+      const task = await Task.findOne({
+        where: {
+          id: task_id,
+        },
+        include: [
+          {
+            model: Project,
+            include: {
+              model: User,
+              attributes: ["id", "name", "email", "image"],
+            },
+          },
+          { model: User, attributes: ["id", "name", "email", "image"] },
+          {
+            model: Comment,
+            include: {
+              model: User,
+              attributes: ["id", "name", "email", "image"],
+            },
+          },
+        ],
+      });
       res.json(task);
     } catch (err) {
       res.send({ error: "Something went wrong" });

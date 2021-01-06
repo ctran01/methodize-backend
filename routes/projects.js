@@ -118,7 +118,12 @@ router.get(
         project_id: project_id,
       },
       order: [["column_index", "ASC"]],
-      include: [{ model: Task }],
+      include: [
+        {
+          model: Task,
+          include: [{ model: User, attributes: ["id", "name", "email"] }],
+        },
+      ],
     });
     if (!tasklist) {
       res.json({ message: "error" });

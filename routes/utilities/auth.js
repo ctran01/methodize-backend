@@ -11,7 +11,10 @@ const getUserToken = (user) => {
   };
 
   // const token = jwt.sign({ data: userDataForToken }, secret);
-  const token = jwt.sign({ data: userDataForToken }, process.env.JWT_SECRET);
+  // const token = jwt.sign({ data: userDataForToken }, process.env.JWT_SECRET);
+  const token = jwt.sign({ data: userDataForToken }, process.env.JWT_SECRET, {
+    expiresIn: parseInt(process.env.JWT_EXPIRES_IN, 10),
+  });
 
   return token;
 };
