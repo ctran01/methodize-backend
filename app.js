@@ -17,13 +17,24 @@ app.use(bodyParser.json());
 // Same as bodyParser but built in
 // app.use(express.json())
 // app.use(express.urlencoded({extended:true}))
+const whitelist = [
+  "http://localhost:3000",
+  "https://methodize-app.herokuapp.com",
+  "http://methodize-app.com",
+];
+
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
 
 app.use(morgan("dev"));
-app.use(
-  cors({
-    origin: "http://localhost:3000" || "https://methodize-app.herokuapp.com",
-  })
-);
+app.use(cors(corsOptions));
 
 app.use(userRouter);
 app.use("/task", taskRouter);
