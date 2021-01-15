@@ -14,8 +14,11 @@ router.get(
   "/",
   asyncHandler(async (req, res, next) => {
     const tasks = await Task.findAll({});
-
-    res.json(tasks);
+    if (tasks) {
+      res.json(tasks);
+    } else {
+      next();
+    }
   })
 );
 
@@ -123,7 +126,11 @@ router.get(
         },
       ],
     });
-    res.json(task);
+    if (task) {
+      res.json(task);
+    } else {
+      return next();
+    }
   })
 );
 

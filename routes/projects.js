@@ -8,6 +8,7 @@ const {
   TaskList,
   Team,
   UserProject,
+  Comment,
   Task,
 } = require("../db/models");
 
@@ -121,7 +122,13 @@ router.get(
       include: [
         {
           model: Task,
-          include: [{ model: User, attributes: ["id", "name", "email"] }],
+          include: [
+            {
+              model: User,
+              attributes: ["id", "name", "email"],
+            },
+            { model: Comment },
+          ],
         },
       ],
     });
