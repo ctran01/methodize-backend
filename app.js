@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 const whitelist = [
   "http://localhost:3000",
   "https://methodize-app.herokuapp.com",
-  "http://methodize-app.com",
+  "http://www.methodize-app.com",
 ];
 
 var corsOptions = {
