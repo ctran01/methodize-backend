@@ -21,6 +21,7 @@ const whitelist = [
   "http://localhost:3000",
   "https://methodize-app.herokuapp.com",
   "http://www.methodize-app.com",
+  "http://ec2-34-211-227-91.us-west-2.compute.amazonaws.com",
 ];
 
 var corsOptions = {
@@ -34,7 +35,8 @@ var corsOptions = {
 };
 
 app.use(morgan("dev"));
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors({ origin: true }));
 
 app.use(userRouter);
 app.use("/task", taskRouter);

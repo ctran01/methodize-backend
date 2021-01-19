@@ -133,7 +133,7 @@ router.get(
       ],
     });
     if (!tasklist) {
-      res.json({ message: "error" });
+      return res.status(404).json({ message: "error" });
     }
     res.json(tasklist);
   })
@@ -190,21 +190,6 @@ router.get(
     const user_id = req.params.userId;
     const project_name = req.params.projectName;
     const project_id = req.params.id;
-    // const project = await Project.findOne({
-    //   include: [
-    //     {
-    //       model: User,
-    //       where: {
-    //         id: user_id,
-    //       },
-    //       attributes: ["name"],
-    //     },
-    //     { model: TaskList },
-    //   ],
-    //   where: {
-    //     name: project_name,
-    //   },
-    // });
 
     const project = await Project.findOne({
       include: [
@@ -218,8 +203,11 @@ router.get(
         id: project_id,
       },
     });
-
-    res.json(project);
+    if (!project) {
+      return res.status(404).json({ message: "Project does not exist" });
+    } else {
+      return res.json(project);
+    }
   })
 );
 
