@@ -14,7 +14,7 @@ const {
 
 const router = express.Router();
 //Authenticates user before being able to use API
-// router.use(requireAuth);
+router.use(requireAuth);
 
 //get all projects
 router.get(

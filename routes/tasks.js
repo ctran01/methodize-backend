@@ -7,7 +7,7 @@ const comment = require("../db/models/comment");
 
 const router = express.Router();
 //Authenticates user before being able to use API
-// router.use(requireAuth);
+router.use(requireAuth);
 
 //get all tasks
 router.get(
@@ -26,7 +26,8 @@ router.get(
 router.get(
   "/user/:id",
   asyncHandler(async (req, res, next) => {
-    const user_id = req.params.id;
+    // const user_id = req.params.id;
+    const user_id = req.user.id;
     const tasks = await Task.findAll({
       where: {
         assignee_id: user_id,

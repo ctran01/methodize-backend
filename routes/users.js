@@ -58,6 +58,48 @@ router.get(
     res.json(users);
   })
 );
+//Log in
+router.post(
+  "/login",
+  validateEmailPassword,
+  asyncHandler(async (req, res, next) => {
+    const validatorErr = validationResult(req);
+
+    if (!validatorErr.isEmpty()) {
+      const errors = validatorErr.array().map((error) => error.msg);
+      res.json(["ERRORS", ...errors]);
+      return;
+    }
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(422).send({ error: "Must provide email and password" });
+    }
+    const user = await User.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user || !user.validatePassword(password)) {
+      const err = new Error("Login Failed");
+      err.status = 401;
+      err.title = "Login Failed";
+      err.errors = ["The provided credentials were invalid"];
+      res.status(401).json(err);
+      return;
+    } else {
+      const token = getUserToken(user);
+
+      res.json({
+        id: user.id,
+        token,
+        email: user.email,
+      });
+    }
+  })
+);
+
 //Register
 router.post(
   "/register",
@@ -146,48 +188,6 @@ router.put(
     // } catch (err) {
     //   res.status(422).send(err.message);
     // }
-  })
-);
-
-//Log in
-router.post(
-  "/login",
-  validateEmailPassword,
-  asyncHandler(async (req, res, next) => {
-    const validatorErr = validationResult(req);
-
-    if (!validatorErr.isEmpty()) {
-      const errors = validatorErr.array().map((error) => error.msg);
-      res.json(["ERRORS", ...errors]);
-      return;
-    }
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(422).send({ error: "Must provide email and password" });
-    }
-    const user = await User.findOne({
-      where: {
-        email,
-      },
-    });
-
-    if (!user || !user.validatePassword(password)) {
-      const err = new Error("Login Failed");
-      err.status = 401;
-      err.title = "Login Failed";
-      err.errors = ["The provided credentials were invalid"];
-      res.status(401).json(err);
-      return;
-    } else {
-      const token = getUserToken(user);
-
-      res.json({
-        id: user.id,
-        token,
-        email: user.email,
-      });
-    }
   })
 );
 

@@ -10,8 +10,6 @@ const getUserToken = (user) => {
     email: user.email,
   };
 
-  // const token = jwt.sign({ data: userDataForToken }, secret);
-  // const token = jwt.sign({ data: userDataForToken }, process.env.JWT_SECRET);
   const token = jwt.sign({ data: userDataForToken }, process.env.JWT_SECRET, {
     expiresIn: parseInt(process.env.JWT_EXPIRES_IN, 10),
   });
@@ -27,28 +25,26 @@ const restoreUser = (req, res, next) => {
   }
 
   //Changed jwt token here as well
-  return jwt.verify(
-    token,
-    process.env.JWT_SECRET,
-    null,
-    async (err, jwtPayload) => {
-      if (err) {
-        err.status = 401;
-        return next(err);
-      }
-
-      const { id } = jwtPayload.data;
-      try {
-        req.user = await User.findByPk(id);
-      } catch (e) {
-        return next(e);
-      }
-      if (!req.user) {
-        return res.set("WWW-Authenicate", "Bearer").status(401).end();
-      }
-      return next();
+  return jwt.verify(token, process.env.JWT_SECRET, async (err, jwtPayload) => {
+    if (err) {
+      err.status = 401;
+      return next(err);
     }
-  );
+
+    const { id } = jwtPayload.data;
+    try {
+      //requireAuth sets req.user to user. This allows api routes to access user.id, user.name without using params on link
+      const user = await User.findByPk(id);
+      req.user = user;
+      next();
+    } catch (e) {
+      return next(e);
+    }
+
+    if (!req.user) {
+      return res.set("WWW-Authenicate", "Bearer").status(401).end();
+    }
+  });
 };
 
 const requireAuth = [bearerToken(), restoreUser];

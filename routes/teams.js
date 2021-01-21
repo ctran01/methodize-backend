@@ -6,7 +6,7 @@ const { Team, UserTeam, User, Project, UserProject } = require("../db/models");
 
 const router = express.Router();
 //Authenticates user before being able to use API
-// router.use(requireAuth);
+router.use(requireAuth);
 
 //Gets all Teams
 router.get(

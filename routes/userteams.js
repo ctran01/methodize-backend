@@ -5,7 +5,7 @@ const { check, validationResult } = require("express-validator");
 const { UserTeam, Team, User } = require("../db/models");
 
 const router = express.Router();
-
+router.use(requireAuth);
 //Leave Team
 
 router.delete(

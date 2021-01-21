@@ -7,7 +7,7 @@ const { Comment } = require("../db/models");
 const router = express.Router();
 
 //Authenticates user before being able to use API
-// router.use(requireAuth);
+router.use(requireAuth);
 
 //get all comments
 router.get(
